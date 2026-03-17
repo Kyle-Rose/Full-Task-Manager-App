@@ -2,7 +2,6 @@ const taskInput = document.getElementById("task-input");
 const addButton = document.getElementById("add-task-button");
 const taskList = document.getElementById("tasks-container");
 
-// Fetch and display tasks
 async function fetchTasks() {
   try {
     const response = await fetch("http://localhost:3000/tasks");
@@ -15,9 +14,8 @@ async function fetchTasks() {
       taskItem.className = "task-item";
 
       const text = document.createElement("span");
-      text.textContent = `${task.description} (User ID: ${task.user_id})`;
+      text.textContent = `${task.description} (User: ${task.username})`;
 
-      // DELETE BUTTON
       const deleteButton = document.createElement("button");
       deleteButton.textContent = "Delete";
       deleteButton.addEventListener("click", async () => {
@@ -33,13 +31,12 @@ async function fetchTasks() {
             return;
           }
 
-          fetchTasks(); // refresh list
+          fetchTasks();
         } catch (err) {
           console.error("Network error:", err);
         }
       });
 
-      // EDIT BUTTON
       const editButton = document.createElement("button");
       editButton.textContent = "Edit";
       editButton.addEventListener("click", async () => {
@@ -77,7 +74,6 @@ async function fetchTasks() {
   }
 }
 
-// Add new task
 addButton.addEventListener("click", async () => {
   const description = taskInput.value.trim();
   if (!description) return;
@@ -104,5 +100,4 @@ addButton.addEventListener("click", async () => {
   }
 });
 
-// Initial fetch
 fetchTasks();

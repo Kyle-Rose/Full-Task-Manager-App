@@ -12,7 +12,15 @@ pool.query(`
 
 router.get("/", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM tasks");
+    const result = await pool.query(`
+      SELECT 
+        tasks.id,
+        tasks.description,
+        tasks.user_id,
+        users.name AS username
+      FROM tasks
+      JOIN users ON tasks.user_id = users.id
+    `);
     res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });

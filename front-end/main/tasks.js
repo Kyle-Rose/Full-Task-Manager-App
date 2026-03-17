@@ -17,10 +17,9 @@ async function fetchTasks() {
       const text = document.createElement("span");
       text.textContent = `${task.description} (User ID: ${task.user_id})`;
 
+      // DELETE BUTTON
       const deleteButton = document.createElement("button");
       deleteButton.textContent = "Delete";
-
-      // DELETE TASK
       deleteButton.addEventListener("click", async () => {
         try {
           const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
@@ -40,7 +39,36 @@ async function fetchTasks() {
         }
       });
 
+      // EDIT BUTTON
+      const editButton = document.createElement("button");
+      editButton.textContent = "Edit";
+      editButton.addEventListener("click", async () => {
+        const newDescription = prompt("Enter new description:", task.description);
+        if (!newDescription) return;
+
+        try {
+          const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ description: newDescription }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            console.error("Server error:", data);
+            alert("Failed to update task");
+            return;
+          }
+
+          fetchTasks();
+        } catch (err) {
+          console.error("Network error:", err);
+        }
+      });
+
       taskItem.appendChild(text);
+      taskItem.appendChild(editButton);
       taskItem.appendChild(deleteButton);
       taskList.appendChild(taskItem);
     });
@@ -57,13 +85,8 @@ addButton.addEventListener("click", async () => {
   try {
     const response = await fetch("http://localhost:3000/tasks", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        description: description,
-        user_id: 5,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ description, user_id: 5 }),
     });
 
     const data = await response.json();

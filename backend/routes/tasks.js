@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../database/db");
 
-// Create table if it doesn't exist
 pool.query(`
   CREATE TABLE IF NOT EXISTS tasks (
     id SERIAL PRIMARY KEY,
@@ -11,7 +10,6 @@ pool.query(`
   )
 `);
 
-// GET all tasks
 router.get("/", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM tasks");
@@ -21,7 +19,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST add task
 router.post("/", async (req, res) => {
   const { description, user_id } = req.body;
   try {
@@ -31,6 +28,25 @@ router.post("/", async (req, res) => {
     );
     res.json(result.rows[0]);
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.put("/:id", async (req, res) => {
+  const { description } = req.body;
+  try {
+    const result = await pool.query(
+      "UPDATE tasks SET description = $1 WHERE id = $2 RETURNING *",
+      [description, req.params.id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });

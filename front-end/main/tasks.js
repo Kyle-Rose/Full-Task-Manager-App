@@ -1,6 +1,25 @@
 const taskInput = document.getElementById("task-input");
 const addButton = document.getElementById("add-task-button");
 const taskList = document.getElementById("tasks-container");
+const userSelect = document.getElementById("user-select");
+
+async function fetchUsers() {
+  try {
+    const response = await fetch("http://localhost:3000/users");
+    const users = await response.json();
+
+    userSelect.innerHTML = '<option value="">Select User</option>';
+
+    users.forEach((user) => {
+      const option = document.createElement("option");
+      option.value = user.id;
+      option.textContent = user.name;
+      userSelect.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Failed to fetch users:", err);
+  }
+}
 
 async function fetchTasks() {
   try {
@@ -76,13 +95,26 @@ async function fetchTasks() {
 
 addButton.addEventListener("click", async () => {
   const description = taskInput.value.trim();
-  if (!description) return;
+  const userId = userSelect.value;
+
+  if (!description) {
+    alert("Please enter a task");
+    return;
+  }
+
+  if (!userId) {
+    alert("Please select a user");
+    return;
+  }
 
   try {
     const response = await fetch("http://localhost:3000/tasks", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ description, user_id: 5 }),
+      body: JSON.stringify({
+        description,
+        user_id: parseInt(userId),
+      }),
     });
 
     const data = await response.json();
@@ -94,10 +126,12 @@ addButton.addEventListener("click", async () => {
     }
 
     taskInput.value = "";
+    userSelect.value = "";
     fetchTasks();
   } catch (err) {
     console.error("Network error:", err);
   }
 });
 
+fetchUsers();
 fetchTasks();

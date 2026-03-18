@@ -4,7 +4,7 @@ const taskList = document.getElementById("tasks-container");
 
 async function fetchTasks() {
   try {
-    const res = await fetch("http://localhost:3000/tasks", {
+    const res = await fetch("/tasks", {
       credentials: "include",
     });
 
@@ -30,6 +30,7 @@ async function fetchTasks() {
       const text = document.createElement("span");
       text.textContent = task.description;
 
+      // EDIT
       const editButton = document.createElement("button");
       editButton.textContent = "Edit";
       editButton.addEventListener("click", async () => {
@@ -37,7 +38,7 @@ async function fetchTasks() {
         if (!newDescription) return;
 
         try {
-          const res = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+          const res = await fetch(`/tasks/${task.id}`, {
             method: "PUT",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
@@ -57,11 +58,12 @@ async function fetchTasks() {
         }
       });
 
+      // DELETE
       const deleteButton = document.createElement("button");
       deleteButton.textContent = "Delete";
       deleteButton.addEventListener("click", async () => {
         try {
-          const res = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+          const res = await fetch(`/tasks/${task.id}`, {
             method: "DELETE",
             credentials: "include",
           });
@@ -89,6 +91,7 @@ async function fetchTasks() {
   }
 }
 
+// ADD TASK
 addButton.addEventListener("click", async () => {
   const description = taskInput.value.trim();
 
@@ -98,7 +101,7 @@ addButton.addEventListener("click", async () => {
   }
 
   try {
-    const res = await fetch("http://localhost:3000/tasks", {
+    const res = await fetch("/tasks", {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -125,4 +128,5 @@ addButton.addEventListener("click", async () => {
   }
 });
 
+// Initial load
 fetchTasks();

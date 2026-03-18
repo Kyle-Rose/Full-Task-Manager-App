@@ -7,7 +7,7 @@ const usersRoutes = require("./routes/users");
 const tasksRoutes = require("./routes/tasks");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(express.json());
@@ -29,3 +29,20 @@ app.get("/tasks-page", (req, res) => {
 app.use((req, res) => res.status(404).send("Not Found"));
 
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+
+app.set("trust proxy", 1);
+
+app.use(session({
+  secret: "secret-key",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: true,
+    sameSite: "none"
+  }
+}));
+
+app.use(cors({
+  origin: true,
+  credentials: true
+}));

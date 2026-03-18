@@ -7,33 +7,24 @@ const usersRoutes = require("./routes/users");
 const tasksRoutes = require("./routes/tasks");
 
 const app = express();
+
+// ✅ MUST USE THIS
 const PORT = process.env.PORT || 3000;
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
-app.use(express.json());
-app.use(session({
-  secret: "secret-key",
-  resave: false,
-  saveUninitialized: false
+// ✅ CORS
+app.use(cors({
+  origin: true,
+  credentials: true
 }));
 
-app.use("/front-end", express.static(path.join(__dirname, "..", "front-end")));
+app.use(express.json());
 
-app.use("/users", usersRoutes);
-app.use("/tasks", tasksRoutes);
-
-app.get("/tasks-page", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "front-end/main/tasks.html"));
-});
-
-app.use((req, res) => res.status(404).send("Not Found"));
-
-app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
-
+// ✅ TRUST PROXY (Render requires this)
 app.set("trust proxy", 1);
 
+// ✅ SESSIONS
 app.use(session({
-  secret: "secret-key",
+  secret: process.env.SESSION_SECRET || "secret",
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -42,7 +33,18 @@ app.use(session({
   }
 }));
 
-app.use(cors({
-  origin: true,
-  credentials: true
-}));
+// ✅ SERVE FRONTEND
+app.use(express.static(path.join(__dirname, "..", "front-end")));
+
+// ✅ ROUTES
+app.use("/users", usersRoutes);
+app.use("/tasks", tasksRoutes);
+
+// ✅ DEFAULT ROUTE → LOGIN PAGE
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "front-end/login/login.html"));
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

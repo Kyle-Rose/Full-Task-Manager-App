@@ -10,7 +10,7 @@ fetchUser.addEventListener("click", () => {
     fetch("http://localhost:3000/users")
         .then((response) => response.json())
         .then((data) => {
-            userList.innerHTML = ""; // clear list before adding
+            userList.innerHTML = "";
 
             data.forEach((user) => {
                 const li = document.createElement("li");

@@ -1,31 +1,55 @@
-const taskInput = document.getElementById("task-input");
+const registerButton = document.getElementById("register-button");
+const loginButton = document.getElementById("login-button");
 const addButton = document.getElementById("add-task-button");
+
+const taskInput = document.getElementById("task-input");
 const taskList = document.getElementById("tasks-container");
-const userSelect = document.getElementById("user-select");
+const tasksSection = document.getElementById("tasks-section");
 
-async function fetchUsers() {
-  try {
-    const response = await fetch("http://localhost:3000/users");
-    const users = await response.json();
+registerButton.addEventListener("click", async () => {
+  const name = document.getElementById("register-name").value.trim();
+  const email = document.getElementById("register-email").value.trim();
+  const password = document.getElementById("register-password").value.trim();
 
-    userSelect.innerHTML = '<option value="">Select User</option>';
+  const res = await fetch("http://localhost:3000/users/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password }),
+  });
+  const data = await res.json();
+  alert(res.ok ? "Registered! Now log in" : data.error);
+});
 
-    users.forEach((user) => {
-      const option = document.createElement("option");
-      option.value = user.id;
-      option.textContent = user.name;
-      userSelect.appendChild(option);
-    });
-  } catch (err) {
-    console.error("Failed to fetch users:", err);
+loginButton.addEventListener("click", async () => {
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value.trim();
+
+  const res = await fetch("http://localhost:3000/users/login", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  const data = await res.json();
+  if (res.ok) {
+    alert(`Logged in as ${data.name}`);
+    tasksSection.style.display = "block";
+    fetchTasks();
+  } else {
+    alert(data.error);
   }
-}
+});
 
 async function fetchTasks() {
   try {
-    const response = await fetch("http://localhost:3000/tasks");
-    const tasks = await response.json();
+    const res = await fetch("http://localhost:3000/tasks", { credentials: "include" });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      console.error("Failed to fetch tasks:", data);
+      return;
+    }
 
+    const tasks = await res.json();
     taskList.innerHTML = "";
 
     tasks.forEach((task) => {
@@ -33,20 +57,26 @@ async function fetchTasks() {
       taskItem.className = "task-item";
 
       const text = document.createElement("span");
-      text.textContent = `${task.description} (User: ${task.username})`;
+      text.textContent = task.description;
 
-      const deleteButton = document.createElement("button");
-      deleteButton.textContent = "Delete";
-      deleteButton.addEventListener("click", async () => {
+      const editButton = document.createElement("button");
+      editButton.textContent = "Edit";
+      editButton.addEventListener("click", async () => {
+        const newDescription = prompt("Enter new description:", task.description);
+        if (!newDescription) return;
+
         try {
-          const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
-            method: "DELETE",
+          const res = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+            method: "PUT",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ description: newDescription }),
           });
 
-          if (!response.ok) {
-            const data = await response.json();
-            console.error("Server error:", data);
-            alert("Failed to delete task");
+          if (!res.ok) {
+            const data = await res.json();
+            console.error("Failed to update task:", data);
+            alert("Failed to update task");
             return;
           }
 
@@ -56,24 +86,19 @@ async function fetchTasks() {
         }
       });
 
-      const editButton = document.createElement("button");
-      editButton.textContent = "Edit";
-      editButton.addEventListener("click", async () => {
-        const newDescription = prompt("Enter new description:", task.description);
-        if (!newDescription) return;
-
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "Delete";
+      deleteButton.addEventListener("click", async () => {
         try {
-          const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ description: newDescription }),
+          const res = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+            method: "DELETE",
+            credentials: "include",
           });
 
-          const data = await response.json();
-
-          if (!response.ok) {
-            console.error("Server error:", data);
-            alert("Failed to update task");
+          if (!res.ok) {
+            const data = await res.json();
+            console.error("Failed to delete task:", data);
+            alert("Failed to delete task");
             return;
           }
 
@@ -95,43 +120,28 @@ async function fetchTasks() {
 
 addButton.addEventListener("click", async () => {
   const description = taskInput.value.trim();
-  const userId = userSelect.value;
-
-  if (!description) {
-    alert("Please enter a task");
-    return;
-  }
-
-  if (!userId) {
-    alert("Please select a user");
-    return;
-  }
+  if (!description) return alert("Enter a task");
 
   try {
-    const response = await fetch("http://localhost:3000/tasks", {
+    const res = await fetch("http://localhost:3000/tasks", {
       method: "POST",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        description,
-        user_id: parseInt(userId),
-      }),
+      body: JSON.stringify({ description }),
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error("Server error:", data);
-      alert("Failed to add task");
+    if (!res.ok) {
+      const data = await res.json();
+      console.error("Failed to add task:", data);
+      alert(data.error);
       return;
     }
 
     taskInput.value = "";
-    userSelect.value = "";
     fetchTasks();
   } catch (err) {
     console.error("Network error:", err);
   }
 });
 
-fetchUsers();
-fetchTasks();
+tasksSection.style.display = "none";

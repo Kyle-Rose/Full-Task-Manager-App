@@ -1,37 +1,40 @@
- // routes/users.js
 const express = require("express");
 const router = express.Router();
 const pool = require("../database/db");
 
-// Create table if it doesn't exist
-pool.query(`
-  CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL
-  )
-`);
-
-// GET all users
-router.get("/", async (req, res) => {
+router.post("/register", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM users");
-    res.json(result.rows);
+    const { name, email, password } = req.body;
+    if (!name || !email || !password)
+      return res.status(400).json({ error: "All fields required" });
+
+    const result = await pool.query(
+      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email",
+      [name, email, password]
+    );
+
+    res.json(result.rows[0]);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// POST add user
-router.post("/", async (req, res) => {
-  const { name, email } = req.body;
+router.post("/login", async (req, res) => {
   try {
-    const result = await pool.query(
-      "INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *",
-      [name, email]
-    );
-    res.json(result.rows[0]);
+    const { email, password } = req.body;
+    if (!email || !password)
+      return res.status(400).json({ error: "Email & password required" });
+
+    const result = await pool.query("SELECT * FROM users WHERE email=$1", [email]);
+    const user = result.rows[0];
+    if (!user || user.password !== password)
+      return res.status(401).json({ error: "Invalid credentials" });
+
+    req.session.user = { id: user.id, name: user.name };
+    res.json({ message: "Logged in", name: user.name });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });

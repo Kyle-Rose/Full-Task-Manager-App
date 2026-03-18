@@ -2,30 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Task Manager</title>
+  <title>My Tasks</title>
   <link rel="stylesheet" href="tasks.css">
 </head>
 <body>
-  <h1>Task Manager</h1>
 
-  <div id="register-container">
-    <input id="register-name" placeholder="Name">
-    <input id="register-email" placeholder="Email">
-    <input id="register-password" placeholder="Password">
-    <button id="register-button">Register</button>
-  </div>
+  <h1>My Tasks</h1>
 
-  <div id="login-container">
-    <input id="login-email" placeholder="Email">
-    <input id="login-password" placeholder="Password">
-    <button id="login-button">Login</button>
-  </div>
+  <input id="task-input" placeholder="Enter a task">
+  <button id="add-task-button">Add Task</button>
 
-  <div id="tasks-section" style="display:none;">
-    <input id="task-input" placeholder="Enter task">
-    <button id="add-task-button">Add Task</button>
-    <div id="tasks-container"></div>
-  </div>
+  <div id="tasks-container"></div>
 
   <script src="tasks.js"></script>
 </body>

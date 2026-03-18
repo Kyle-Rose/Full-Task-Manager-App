@@ -17,7 +17,7 @@ app.use(session({
   saveUninitialized: false
 }));
 
-app.use("/front-end", express.static(path.join(__dirname, "..", "front-end/main")));
+app.use("/front-end", express.static(path.join(__dirname, "..", "front-end")));
 
 app.use("/users", usersRoutes);
 app.use("/tasks", tasksRoutes);

@@ -1,51 +1,22 @@
-const registerButton = document.getElementById("register-button");
-const loginButton = document.getElementById("login-button");
-const addButton = document.getElementById("add-task-button");
-
 const taskInput = document.getElementById("task-input");
+const addButton = document.getElementById("add-task-button");
 const taskList = document.getElementById("tasks-container");
-const tasksSection = document.getElementById("tasks-section");
-
-registerButton.addEventListener("click", async () => {
-  const name = document.getElementById("register-name").value.trim();
-  const email = document.getElementById("register-email").value.trim();
-  const password = document.getElementById("register-password").value.trim();
-
-  const res = await fetch("http://localhost:3000/users/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, email, password }),
-  });
-  const data = await res.json();
-  alert(res.ok ? "Registered! Now log in" : data.error);
-});
-
-loginButton.addEventListener("click", async () => {
-  const email = document.getElementById("login-email").value.trim();
-  const password = document.getElementById("login-password").value.trim();
-
-  const res = await fetch("http://localhost:3000/users/login", {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-  const data = await res.json();
-  if (res.ok) {
-    alert(`Logged in as ${data.name}`);
-    tasksSection.style.display = "block";
-    fetchTasks();
-  } else {
-    alert(data.error);
-  }
-});
 
 async function fetchTasks() {
   try {
-    const res = await fetch("http://localhost:3000/tasks", { credentials: "include" });
+    const res = await fetch("http://localhost:3000/tasks", {
+      credentials: "include",
+    });
+
+    if (res.status === 401) {
+      alert("You must log in first");
+      window.location.href = "/front-end/login/login.html";
+      return;
+    }
+
     if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      console.error("Failed to fetch tasks:", data);
+      const err = await res.json().catch(() => ({}));
+      console.error("Error fetching tasks:", err);
       return;
     }
 
@@ -62,7 +33,7 @@ async function fetchTasks() {
       const editButton = document.createElement("button");
       editButton.textContent = "Edit";
       editButton.addEventListener("click", async () => {
-        const newDescription = prompt("Enter new description:", task.description);
+        const newDescription = prompt("Edit task:", task.description);
         if (!newDescription) return;
 
         try {
@@ -75,7 +46,7 @@ async function fetchTasks() {
 
           if (!res.ok) {
             const data = await res.json();
-            console.error("Failed to update task:", data);
+            console.error("Edit error:", data);
             alert("Failed to update task");
             return;
           }
@@ -97,7 +68,7 @@ async function fetchTasks() {
 
           if (!res.ok) {
             const data = await res.json();
-            console.error("Failed to delete task:", data);
+            console.error("Delete error:", data);
             alert("Failed to delete task");
             return;
           }
@@ -114,13 +85,17 @@ async function fetchTasks() {
       taskList.appendChild(taskItem);
     });
   } catch (err) {
-    console.error("Failed to fetch tasks:", err);
+    console.error("Fetch failed:", err);
   }
 }
 
 addButton.addEventListener("click", async () => {
   const description = taskInput.value.trim();
-  if (!description) return alert("Enter a task");
+
+  if (!description) {
+    alert("Please enter a task");
+    return;
+  }
 
   try {
     const res = await fetch("http://localhost:3000/tasks", {
@@ -130,10 +105,16 @@ addButton.addEventListener("click", async () => {
       body: JSON.stringify({ description }),
     });
 
+    if (res.status === 401) {
+      alert("You must log in first");
+      window.location.href = "/front-end/login/login.html";
+      return;
+    }
+
     if (!res.ok) {
       const data = await res.json();
-      console.error("Failed to add task:", data);
-      alert(data.error);
+      console.error("Add error:", data);
+      alert(data.error || "Failed to add task");
       return;
     }
 
@@ -144,4 +125,4 @@ addButton.addEventListener("click", async () => {
   }
 });
 
-tasksSection.style.display = "none";
+fetchTasks();

@@ -38,7 +38,7 @@ loginButton.addEventListener("click", async () => {
 
     if (res.ok) {
       alert(`Logged in as ${data.name}`);
-      window.location.href = "/front-end/main/tasks.html";
+      window.location.href = "/main/tasks.html"; 
     } else {
       alert(data.error);
     }

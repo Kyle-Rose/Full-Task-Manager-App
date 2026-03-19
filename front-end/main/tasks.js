@@ -1,6 +1,29 @@
 const taskInput = document.getElementById("task-input");
 const addButton = document.getElementById("add-task-button");
 const taskList = document.getElementById("tasks-container");
+const logoutButton = document.getElementById("logout");
+
+// LOGOUT
+logoutButton.addEventListener("click", async () => {
+  try {
+    const res = await fetch("/users/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      console.error("Logout error:", data);
+      alert("Failed to log out");
+      return;
+    }
+
+    alert("Logged out successfully");
+    window.location.href = "/front-end/login/login.html";
+  } catch (err) {
+    console.error("Network error:", err);
+  }
+});
 
 async function fetchTasks() {
   try {

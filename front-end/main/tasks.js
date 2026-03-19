@@ -6,7 +6,7 @@ const logoutButton = document.getElementById("logout");
 // LOGOUT
 logoutButton.addEventListener("click", async () => {
   try {
-    const res = await fetch("/users/logout", {
+    const res = await fetch("/routes/logout", {
       method: "POST",
       credentials: "include",
     });

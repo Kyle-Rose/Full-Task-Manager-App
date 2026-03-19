@@ -19,7 +19,7 @@ logoutButton.addEventListener("click", async () => {
     }
 
     alert("Logged out successfully");
-    window.location.href = "/front-end/login/login.html";
+    window.location.href = "/login/login.html";
   } catch (err) {
     console.error("Network error:", err);
   }
@@ -33,7 +33,7 @@ async function fetchTasks() {
 
     if (res.status === 401) {
       alert("You must log in first");
-      window.location.href = "/front-end/login/login.html";
+      window.location.href = "/login/login.html";
       return;
     }
 
@@ -133,7 +133,7 @@ addButton.addEventListener("click", async () => {
 
     if (res.status === 401) {
       alert("You must log in first");
-      window.location.href = "/front-end/login/login.html";
+      window.location.href = "/login/login.html";
       return;
     }
 

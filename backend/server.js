@@ -39,6 +39,7 @@ app.use(express.static(path.join(__dirname, "..", "front-end")));
 // ✅ ROUTES
 app.use("/users", usersRoutes);
 app.use("/tasks", tasksRoutes);
+app.use("/logout", require("./routes/logout"));
 
 // ✅ DEFAULT ROUTE → LOGIN PAGE
 app.get("/", (req, res) => {

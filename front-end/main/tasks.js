@@ -6,10 +6,10 @@ const logoutButton = document.getElementById("logout");
 // LOGOUT
 logoutButton.addEventListener("click", async () => {
   try {
-    const res = await fetch("/routes/logout", {
-      method: "POST",
-      credentials: "include",
-    });
+    const res = await fetch("/logout", {
+    method: "POST",
+    credentials: "include",
+  });
 
     if (!res.ok) {
       const data = await res.json();

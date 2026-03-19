@@ -1,10 +1,15 @@
-router.post("/logout", (req, res) => {
+const express = require("express");
+const router = express.Router();
+
+router.post("/", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      return res.status(500).json({ error: "Failed to log out" });
+      return res.status(500).json({ error: "Logout failed" });
     }
 
-    res.clearCookie("connect.sid"); // important
+    res.clearCookie("connect.sid");
     res.json({ message: "Logged out" });
   });
 });
+
+module.exports = router;

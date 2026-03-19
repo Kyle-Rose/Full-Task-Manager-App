@@ -5,6 +5,7 @@ const session = require("express-session");
 
 const usersRoutes = require("./routes/users");
 const tasksRoutes = require("./routes/tasks");
+const logoutRoutes = require("./routes/logout");
 
 const app = express();
 
@@ -39,7 +40,7 @@ app.use(express.static(path.join(__dirname, "..", "front-end")));
 // ✅ ROUTES
 app.use("/users", usersRoutes);
 app.use("/tasks", tasksRoutes);
-app.use("/logout", require("./routes/logout"));
+app.use("/logout", logoutRoutes);
 
 // ✅ DEFAULT ROUTE → LOGIN PAGE
 app.get("/", (req, res) => {

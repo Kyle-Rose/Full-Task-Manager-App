@@ -1,0 +1,39 @@
+body {
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 50px;
+}
+
+/* Make the input container a flex row */
+#input-container {
+    display: flex;              /* side by side */
+    justify-content: center;    /* center horizontally */
+    gap: 20px;                  /* space between boxes */
+    flex-wrap: wrap;            /* wrap on smaller screens */
+}
+
+.register-container, .login-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    width: 300px;
+}
+
+input {
+    width: 75%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}

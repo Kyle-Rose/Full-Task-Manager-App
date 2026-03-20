@@ -1,3 +1,5 @@
+require("dotenv").config();   // ✅ MUST BE FIRST
+
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
@@ -6,6 +8,8 @@ const session = require("express-session");
 const usersRoutes = require("./routes/users");
 const tasksRoutes = require("./routes/tasks");
 const logoutRoutes = require("./routes/logout");
+const isProduction = process.env.NODE_ENV === "production";
+
 
 const app = express();
 
@@ -29,8 +33,9 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: true,
-    sameSite: "none"
+    secure: isProduction,              // ✅ only true in production
+    sameSite: isProduction ? "none" : "lax", // ✅ "none" in production, "lax" in development
+    maxAge: 1000 * 60 * 60 * 24 // 1 day
   }
 }));
 

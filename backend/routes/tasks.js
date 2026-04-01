@@ -2,10 +2,12 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../database/db");
 
+// Ensure the tasks table exists and includes completed column
 pool.query(`
   CREATE TABLE IF NOT EXISTS tasks (
     id SERIAL PRIMARY KEY,
     description TEXT,
+    completed BOOLEAN DEFAULT FALSE,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE
   )
 `);
@@ -15,7 +17,7 @@ router.get("/", async (req, res) => {
     if (!req.session.user) return res.status(401).json({ error: "Not logged in" });
 
     const result = await pool.query(
-      "SELECT id, description FROM tasks WHERE user_id = $1",
+      "SELECT id, description, completed FROM tasks WHERE user_id = $1",
       [req.session.user.id]
     );
 
@@ -44,13 +46,20 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Update task description or completion
 router.put("/:id", async (req, res) => {
   try {
-    const { description } = req.body;
+    const { description, completed } = req.body;
+
     const result = await pool.query(
-      "UPDATE tasks SET description=$1 WHERE id=$2 RETURNING *",
-      [description, req.params.id]
+      `UPDATE tasks
+       SET description = COALESCE($1, description),
+           completed = COALESCE($2, completed)
+       WHERE id = $3
+       RETURNING *`,
+      [description, completed, req.params.id]
     );
+
     if (result.rowCount === 0) return res.status(404).json({ error: "Task not found" });
     res.json(result.rows[0]);
   } catch (err) {

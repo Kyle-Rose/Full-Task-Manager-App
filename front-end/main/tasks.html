@@ -7,17 +7,30 @@
 </head>
 <body>
 
-  <h1>My Tasks</h1>
-  <div id="button-container">
-  <button id="logout">Logout</button>
-  </div>
+  <div class="todo-container">
 
-  <div id="task-input-container">
-  <input id="task-input" placeholder="Enter a task">
-  <button id="add-task-button">Add Task</button>
-  </div>
+    <!-- Header -->
+    <div class="todo-section">
+      <h1>My Tasks</h1>
+      <p>Stay organized and get things done</p>
 
-  <div id="tasks-container"></div>
+      <!-- Logout button -->
+      <div id="button-container">
+        <button id="logout">Logout</button>
+      </div>
+
+      <!-- Input -->
+      <div class="input-group" id="task-input-container">
+        <input id="task-input" placeholder="Enter a task">
+        <button id="add-task-button">Add</button>
+      </div>
+
+      <!-- Tasks -->
+      <div id="tasks-container"></div>
+
+    </div>
+
+  </div>
 
   <script src="tasks.js"></script>
 </body>

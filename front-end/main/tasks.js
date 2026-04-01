@@ -7,29 +7,25 @@ const logoutButton = document.getElementById("logout");
 logoutButton.addEventListener("click", async () => {
   try {
     const res = await fetch("/logout", {
-    method: "POST",
-    credentials: "include",
-  });
+      method: "POST",
+      credentials: "include",
+    });
 
     if (!res.ok) {
-      const data = await res.json();
-      console.error("Logout error:", data);
       alert("Failed to log out");
       return;
     }
 
-    alert("Logged out successfully");
     window.location.href = "/login/login.html";
   } catch (err) {
     console.error("Network error:", err);
   }
 });
 
+// FETCH TASKS
 async function fetchTasks() {
   try {
-    const res = await fetch("/tasks", {
-      credentials: "include",
-    });
+    const res = await fetch("/tasks", { credentials: "include" });
 
     if (res.status === 401) {
       alert("You must log in first");
@@ -38,8 +34,7 @@ async function fetchTasks() {
     }
 
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      console.error("Error fetching tasks:", err);
+      console.error("Error fetching tasks");
       return;
     }
 
@@ -50,8 +45,49 @@ async function fetchTasks() {
       const taskItem = document.createElement("div");
       taskItem.className = "task-item";
 
+      const label = document.createElement("label");
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = task.completed; // ✅ Set initial state
+
       const text = document.createElement("span");
       text.textContent = task.description;
+      if (task.completed) {
+        text.style.textDecoration = "line-through";
+        text.style.color = "#888";
+      }
+
+      // CHECKBOX TOGGLE + SAVE TO BACKEND
+      checkbox.addEventListener("change", async () => {
+        try {
+          const res = await fetch(`/tasks/${task.id}`, {
+            method: "PUT",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ completed: checkbox.checked }),
+          });
+
+          if (!res.ok) {
+            alert("Failed to update task");
+            return;
+          }
+
+          // Update style instantly
+          if (checkbox.checked) {
+            text.style.textDecoration = "line-through";
+            text.style.color = "#888";
+          } else {
+            text.style.textDecoration = "none";
+            text.style.color = "#000";
+          }
+        } catch (err) {
+          console.error("Network error:", err);
+        }
+      });
+
+      label.appendChild(checkbox);
+      label.appendChild(text);
 
       // EDIT
       const editButton = document.createElement("button");
@@ -69,8 +105,6 @@ async function fetchTasks() {
           });
 
           if (!res.ok) {
-            const data = await res.json();
-            console.error("Edit error:", data);
             alert("Failed to update task");
             return;
           }
@@ -92,8 +126,6 @@ async function fetchTasks() {
           });
 
           if (!res.ok) {
-            const data = await res.json();
-            console.error("Delete error:", data);
             alert("Failed to delete task");
             return;
           }
@@ -104,9 +136,10 @@ async function fetchTasks() {
         }
       });
 
-      taskItem.appendChild(text);
+      taskItem.appendChild(label);
       taskItem.appendChild(editButton);
       taskItem.appendChild(deleteButton);
+
       taskList.appendChild(taskItem);
     });
   } catch (err) {
@@ -117,7 +150,6 @@ async function fetchTasks() {
 // ADD TASK
 addButton.addEventListener("click", async () => {
   const description = taskInput.value.trim();
-
   if (!description) {
     alert("Please enter a task");
     return;
@@ -138,9 +170,7 @@ addButton.addEventListener("click", async () => {
     }
 
     if (!res.ok) {
-      const data = await res.json();
-      console.error("Add error:", data);
-      alert(data.error || "Failed to add task");
+      alert("Failed to add task");
       return;
     }
 
@@ -151,5 +181,10 @@ addButton.addEventListener("click", async () => {
   }
 });
 
-// Initial load
+// ENTER KEY SUPPORT
+taskInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") addButton.click();
+});
+
+// INITIAL LOAD
 fetchTasks();

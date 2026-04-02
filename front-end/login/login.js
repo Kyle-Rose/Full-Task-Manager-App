@@ -1,30 +1,9 @@
-const registerButton = document.getElementById("register-button");
-const loginButton = document.getElementById("login-button");
-
-// REGISTER
-registerButton.addEventListener("click", async () => {
-  const name = document.getElementById("register-name").value.trim();
-  const email = document.getElementById("register-email").value.trim();
-  const password = document.getElementById("register-password").value.trim();
-
-  try {
-    const res = await fetch("/users/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
-    });
-
-    const data = await res.json();
-    alert(res.ok ? "Registered! Now log in" : data.error);
-  } catch (err) {
-    console.error(err);
-  }
-});
+const loginButton = document.getElementById("login-btn");
 
 // LOGIN
 loginButton.addEventListener("click", async () => {
-  const email = document.getElementById("login-email").value.trim();
-  const password = document.getElementById("login-password").value.trim();
+  const email = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
 
   try {
     const res = await fetch("/users/login", {

@@ -49,7 +49,7 @@ app.use("/logout", logoutRoutes);
 
 // ✅ DEFAULT ROUTE → LOGIN PAGE
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "front-end/login/login.html"));
+  res.redirect("/login/login.html");
 });
 
 app.listen(PORT, () => {

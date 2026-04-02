@@ -2,6 +2,9 @@ const taskInput = document.getElementById("task-input");
 const addButton = document.getElementById("add-task-button");
 const taskList = document.getElementById("tasks-container");
 const logoutButton = document.getElementById("logout");
+const filterDropdown = document.getElementById("filter");
+
+let allTasks = [];
 
 // LOGOUT
 logoutButton.addEventListener("click", async () => {
@@ -38,114 +41,137 @@ async function fetchTasks() {
       return;
     }
 
-    const tasks = await res.json();
-    taskList.innerHTML = "";
-
-    tasks.forEach((task) => {
-      const taskItem = document.createElement("div");
-      taskItem.className = "task-item";
-
-      const label = document.createElement("label");
-
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.checked = task.completed; // ✅ Set initial state
-
-      const text = document.createElement("span");
-      text.textContent = task.description;
-      if (task.completed) {
-        text.style.textDecoration = "line-through";
-        text.style.color = "#888";
-      }
-
-      // CHECKBOX TOGGLE + SAVE TO BACKEND
-      checkbox.addEventListener("change", async () => {
-        try {
-          const res = await fetch(`/tasks/${task.id}`, {
-            method: "PUT",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ completed: checkbox.checked }),
-          });
-
-          if (!res.ok) {
-            alert("Failed to update task");
-            return;
-          }
-
-          // Update style instantly
-          if (checkbox.checked) {
-            text.style.textDecoration = "line-through";
-            text.style.color = "#888";
-          } else {
-            text.style.textDecoration = "none";
-            text.style.color = "#000";
-          }
-        } catch (err) {
-          console.error("Network error:", err);
-        }
-      });
-
-      label.appendChild(checkbox);
-      label.appendChild(text);
-
-      // EDIT
-      const editButton = document.createElement("button");
-      editButton.textContent = "Edit";
-      editButton.addEventListener("click", async () => {
-        const newDescription = prompt("Edit task:", task.description);
-        if (!newDescription) return;
-
-        try {
-          const res = await fetch(`/tasks/${task.id}`, {
-            method: "PUT",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ description: newDescription }),
-          });
-
-          if (!res.ok) {
-            alert("Failed to update task");
-            return;
-          }
-
-          fetchTasks();
-        } catch (err) {
-          console.error("Network error:", err);
-        }
-      });
-
-      // DELETE
-      const deleteButton = document.createElement("button");
-      deleteButton.textContent = "Delete";
-      deleteButton.addEventListener("click", async () => {
-        try {
-          const res = await fetch(`/tasks/${task.id}`, {
-            method: "DELETE",
-            credentials: "include",
-          });
-
-          if (!res.ok) {
-            alert("Failed to delete task");
-            return;
-          }
-
-          fetchTasks();
-        } catch (err) {
-          console.error("Network error:", err);
-        }
-      });
-
-      taskItem.appendChild(label);
-      taskItem.appendChild(editButton);
-      taskItem.appendChild(deleteButton);
-
-      taskList.appendChild(taskItem);
-    });
+    allTasks = await res.json();
+    renderTasks();
   } catch (err) {
     console.error("Fetch failed:", err);
   }
 }
+
+// FILTER LOGIC
+function getFilteredTasks() {
+  const filter = filterDropdown.value;
+
+  if (filter === "active") {
+    return allTasks.filter(task => !task.completed);
+  }
+
+  if (filter === "completed") {
+    return allTasks.filter(task => task.completed);
+  }
+
+  return allTasks;
+}
+
+// RENDER TASKS
+function renderTasks() {
+  const tasks = getFilteredTasks();
+
+  taskList.innerHTML = "";
+
+  tasks.forEach((task) => {
+    const taskItem = document.createElement("div");
+    taskItem.className = "task-item";
+
+    const label = document.createElement("label");
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = task.completed;
+
+    const text = document.createElement("span");
+    text.textContent = task.description;
+
+    if (task.completed) {
+      text.style.textDecoration = "line-through";
+      text.style.color = "#888";
+    }
+
+    checkbox.addEventListener("change", async () => {
+      try {
+        const res = await fetch(`/tasks/${task.id}`, {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ completed: checkbox.checked }),
+        });
+
+        if (!res.ok) {
+          alert("Failed to update task");
+          return;
+        }
+
+        fetchTasks();
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    label.appendChild(checkbox);
+    label.appendChild(text);
+
+    // EDIT
+    const editButton = document.createElement("button");
+    editButton.textContent = "Edit";
+    editButton.addEventListener("click", async () => {
+      const newDescription = prompt("Edit task:", task.description);
+      if (!newDescription) return;
+
+      try {
+        const res = await fetch(`/tasks/${task.id}`, {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ description: newDescription }),
+        });
+
+        if (!res.ok) {
+          alert("Failed to update task");
+          return;
+        }
+
+        fetchTasks();
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    // DELETE
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+    deleteButton.addEventListener("click", async () => {
+      try {
+        const res = await fetch(`/tasks/${task.id}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          alert("Failed to delete task");
+          return;
+        }
+
+        fetchTasks();
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    const buttonGroup = document.createElement("div");
+    buttonGroup.className = "button-group";
+
+    buttonGroup.appendChild(editButton);
+    buttonGroup.appendChild(deleteButton);
+
+    taskItem.appendChild(label);
+    taskItem.appendChild(buttonGroup);
+
+    taskList.appendChild(taskItem);
+  });
+}
+
+// FILTER CHANGE EVENT
+filterDropdown.addEventListener("change", renderTasks);
 
 // ADD TASK
 addButton.addEventListener("click", async () => {
@@ -164,27 +190,21 @@ addButton.addEventListener("click", async () => {
     });
 
     if (res.status === 401) {
-      alert("You must log in first");
       window.location.href = "/login/login.html";
-      return;
-    }
-
-    if (!res.ok) {
-      alert("Failed to add task");
       return;
     }
 
     taskInput.value = "";
     fetchTasks();
   } catch (err) {
-    console.error("Network error:", err);
+    console.error(err);
   }
 });
 
-// ENTER KEY SUPPORT
+// ENTER KEY
 taskInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") addButton.click();
 });
 
-// INITIAL LOAD
+// LOAD
 fetchTasks();

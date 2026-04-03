@@ -2,7 +2,7 @@ const loginButton = document.getElementById("login-btn");
 
 // LOGIN
 loginButton.addEventListener("click", async () => {
-  const email = document.getElementById("username").value.trim();
+  const name = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
 
   try {
@@ -10,7 +10,7 @@ loginButton.addEventListener("click", async () => {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ name, password }),
     });
 
     const data = await res.json();

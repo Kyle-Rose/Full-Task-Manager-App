@@ -22,11 +22,11 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password)
-      return res.status(400).json({ error: "Email & password required" });
-
-    const result = await pool.query("SELECT * FROM users WHERE email=$1", [email]);
+    const { name, password } = req.body;
+    if (!name || !password)
+      return res.status(400).json({ error: "Name & password required" });
+    
+    const result = await pool.query("SELECT * FROM users WHERE name=$1", [name]);
     const user = result.rows[0];
     if (!user || user.password !== password)
       return res.status(401).json({ error: "Invalid credentials" });

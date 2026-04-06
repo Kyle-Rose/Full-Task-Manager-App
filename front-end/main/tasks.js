@@ -9,7 +9,7 @@ let allTasks = [];
 // LOGOUT
 logoutButton.addEventListener("click", async () => {
   try {
-    const res = await fetch("/logout", {
+    const res = await fetch("/users/logout", {
       method: "POST",
       credentials: "include",
     });

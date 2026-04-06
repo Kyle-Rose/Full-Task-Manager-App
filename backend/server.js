@@ -7,7 +7,6 @@ const session = require("express-session");
 
 const usersRoutes = require("./routes/users");
 const tasksRoutes = require("./routes/tasks");
-const logoutRoutes = require("./routes/logout");
 const isProduction = process.env.NODE_ENV === "production";
 
 
@@ -45,7 +44,6 @@ app.use(express.static(path.join(__dirname, "..", "front-end")));
 // ✅ ROUTES
 app.use("/users", usersRoutes);
 app.use("/tasks", tasksRoutes);
-app.use("/logout", logoutRoutes);
 
 // ✅ DEFAULT ROUTE → LOGIN PAGE
 app.get("/", (req, res) => {

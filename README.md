@@ -45,7 +45,9 @@ Use the following credentials to test the app:
 - Database integration with PostgreSQL
 - Full-stack application architecture
 
-📬 Contact
+---
+
+## 📬 Contact
 Kyle Rose
-GitHub: https://github.com/Kyle-Rose
-Email: kylerose266@gmail.com
+**GitHub:** https://github.com/Kyle-Rose
+**Email:** kylerose266@gmail.com

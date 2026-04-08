@@ -39,11 +39,11 @@ Use the following credentials to test the app:
 ⚠️ Note: Tasks reset on each login for the demo account.
 
 📸 Key Concepts Demonstrated
-RESTful API development
-Session-based authentication
-CRUD operations
-Database integration with PostgreSQL
-Full-stack application architecture
+- RESTful API development
+- Session-based authentication
+- CRUD operations
+- Database integration with PostgreSQL
+- Full-stack application architecture
 
 📬 Contact
 Kyle Rose

@@ -48,6 +48,6 @@ Use the following credentials to test the app:
 ---
 
 ## 📬 Contact
-Kyle Rose
-**GitHub:** https://github.com/Kyle-Rose
-**Email:** kylerose266@gmail.com
+- Kyle Rose
+- **GitHub:** https://github.com/Kyle-Rose
+- **Email:** kylerose266@gmail.com

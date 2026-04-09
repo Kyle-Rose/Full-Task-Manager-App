@@ -1,4 +1,4 @@
-require("dotenv").config();   // ✅ MUST BE FIRST
+require("dotenv").config(); 
 
 const express = require("express");
 const path = require("path");
@@ -23,7 +23,7 @@ app.use(express.json());
 
 app.set("trust proxy", 1);
 
-// ✅ SESSIONS
+
 app.use(session({
   secret: process.env.SESSION_SECRET || "secret",
   resave: false,

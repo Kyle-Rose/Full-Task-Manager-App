@@ -12,10 +12,8 @@ const isProduction = process.env.NODE_ENV === "production";
 
 const app = express();
 
-// ✅ MUST USE THIS
 const PORT = process.env.PORT || 3000;
 
-// ✅ CORS
 app.use(cors({
   origin: true,
   credentials: true
@@ -23,7 +21,6 @@ app.use(cors({
 
 app.use(express.json());
 
-// ✅ TRUST PROXY (Render requires this)
 app.set("trust proxy", 1);
 
 // ✅ SESSIONS
@@ -32,20 +29,20 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: isProduction,              // ✅ only true in production
-    sameSite: isProduction ? "none" : "lax", // ✅ "none" in production, "lax" in development
+    secure: isProduction,           
+    sameSite: isProduction ? "none" : "lax", 
     maxAge: 1000 * 60 * 60 * 24 // 1 day
   }
 }));
 
-// ✅ SERVE FRONTEND
+
 app.use(express.static(path.join(__dirname, "..", "front-end")));
 
-// ✅ ROUTES
+
 app.use("/users", usersRoutes);
 app.use("/tasks", tasksRoutes);
 
-// ✅ DEFAULT ROUTE → LOGIN PAGE
+
 app.get("/", (req, res) => {
   res.redirect("/login/login.html");
 });
